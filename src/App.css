@@ -36,3 +36,30 @@
 .vr-list-swap > select {
   width: 100px;
 }
+
+.vr-table {
+  border-collapse: collapse;
+}
+
+.vr-table th,
+.vr-table td {
+  border: solid gray 1px;
+  padding: 5px;
+}
+
+.vr-table th {
+  text-align: center;
+}
+
+.vr-table .number {
+  text-align: right;
+}
+
+.vr-table .sort {
+  display: inline-block;
+  width: 20px;
+}
+
+.vr-table .string {
+  text-align: left;
+}

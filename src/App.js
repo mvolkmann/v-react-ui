@@ -1,21 +1,29 @@
 import React, {Component} from 'react';
 import VRListSwap from './vr-list-swap';
 import VRStateSelect from './vr-state-select';
+import VRTable from './vr-table';
 import './App.css';
 
 class App extends Component {
   constructor() {
     super();
 
+    const columns = [
+      {heading: 'Sport Name', property: 'name', type: 'string'},
+      {heading: 'Ball Used', property: 'ball', type: 'string'},
+      {heading: 'Team Size', property: 'teamSize', type: 'number'}
+    ];
+    const sports = [
+      {name: 'Baseball', ball: 'baseball', teamSize: 9},
+      {name: 'Football', ball: 'football', teamSize: 11},
+      {name: 'Golf', ball: 'golf ball', teamSize: 1},
+      {name: 'Hockey', ball: 'puck', teamSize: 6}
+    ];
     this.state = {
-      leftSports: [
-        {name: 'Baseball', ball: 'baseball'},
-        {name: 'Football', ball: 'football'},
-        {name: 'Hockey', ball: 'puck'}
-      ],
-      rightSports: [
-        {name: 'Golf', ball: 'golf ball'}
-      ]
+      columns,
+      sports,
+      leftSports: sports,
+      rightSports: []
     };
 
     // Pre-binds
@@ -32,7 +40,7 @@ class App extends Component {
   }
 
   render() {
-    const {leftSports, rightSports} = this.state;
+    const {columns, leftSports, rightSports, sports} = this.state;
 
     return (
       <div className="App">
@@ -47,11 +55,14 @@ class App extends Component {
         <div>
           You selected {this.state.selectedUsState}.
         </div>
+
         <VRListSwap
           left={leftSports}
           right={rightSports}
           display="name"
           update={this.onListUpdate}/>
+
+        <VRTable columns={columns} data={sports}/>
       </div>
     );
   }
