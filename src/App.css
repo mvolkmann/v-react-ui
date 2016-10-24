@@ -57,6 +57,7 @@
 
 .vr-table .sort {
   display: inline-block;
+  font-size: 10px;
   width: 20px;
 }
 

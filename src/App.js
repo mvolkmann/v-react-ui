@@ -62,7 +62,7 @@ class App extends Component {
           display="name"
           update={this.onListUpdate}/>
 
-        <VRTable columns={columns} data={sports}/>
+        <VRTable columns={columns} data={sports} filter/>
       </div>
     );
   }
