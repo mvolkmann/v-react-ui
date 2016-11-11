@@ -4,9 +4,7 @@ import VRDropDown from './vr-drop-down';
 const {func} = React.PropTypes;
 
 class VRStateSelect extends VRDropDown {
-  static propTypes = {
-    onChange: func.isRequired,
-  };
+  static propTypes = {onChange: func.isRequired};
 
   constructor() {
     super();

@@ -1,6 +1,8 @@
 import React from 'react';
 
-const {arrayOf, bool, number, object, shape, string} = React.PropTypes;
+const {arrayOf, bool, func, number, shape, string} = React.PropTypes;
+
+// max-statements-per-line doesn't work!
 
 class VRTable extends React.Component {
   static propTypes = {
@@ -8,9 +10,10 @@ class VRTable extends React.Component {
       heading: string.isRequired,
       property: string.isRequired
     })).isRequired,
-    data: arrayOf(object).isRequired,
     filter: bool, // true to include filter row below heading row
-    maxRows: number // for pagination
+    getData: func.isRequired,
+    pageSize: number, // for pagination
+    startRow: number // for pagination; NOT USED YET
   };
 
   static defaultProps = {size: 5};
@@ -18,71 +21,64 @@ class VRTable extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      filteredData: props.data,
-      filters: [],
-      sortAscending: true,
-      sortColumn: props.columns[0]
-    };
+    const {columns, pageSize} = props;
 
-    // Prebind
-    this.filter = this.filter.bind(this);
+    this.state = {
+      config: {
+        filters: [],
+        page: 1,
+        pageCount: 1,
+        pageSize,
+        sort: {
+          ascending: true,
+          property: columns[0].property,
+          type: columns[0].type
+        }
+      }
+    };
+  }
+
+  componentDidMount() {
+    this.refresh();
   }
 
   changeFilter(index, event) {
-    const {filters} = this.state;
+    const {config} = this.state;
+    console.log('vr-table.js changeFilter: config =', config);
+    const {filters} = config;
     filters[index] = event.target.value;
-    this.setState({filters});
+    this.setState({config});
   }
 
-  filter() {
-    const {columns, data} = this.props;
-    const {filters, sortAscending, sortColumn} = this.state;
-    const filteredData = data.filter(obj =>
-      columns.every((column, index) => {
-        const {property, type} = column;
-        const value = obj[property];
-        const filter = filters[index];
-        return !filter ? true :
-          type === 'string' ? value.includes(filter) :
-          type === 'number' ? value === Number(filter) :
-          true; // cannot yet filter other types
-      }));
-    this.sortData(filteredData, sortColumn, sortAscending);
-    this.setState({filteredData});
-  }
-
-  sortData(data, column, ascending) {
-    const {property, type} = column;
-    data.sort((obj1, obj2) => {
-      const value1 = obj1[property];
-      const value2 = obj2[property];
-      const sortValue =
-        type === 'string' ? value1.localeCompare(value2) :
-        type === 'number' ? value1 - value2 :
-        0; // can't currently sort any other types
-      return ascending ? sortValue : -sortValue;
+  refresh() {
+    const {config} = this.state;
+    this.props.getData(config).then(({config, data}) => {
+      const {page, pageCount} = config;
+      this.setState({data, page, pageCount});
     });
   }
 
-  sortColumn(column) {
-    const {filteredData, sortColumn} = this.state;
-    const sortAscending =
-      column === sortColumn ? !this.state.sortAscending : true;
-    this.sortData(filteredData, column, sortAscending);
-    this.setState({filteredData, sortAscending, sortColumn: column});
+  sort(column) {
+    const {sort} = this.state.config;
+    sort.ascending = true; //TODO: Fix
+    sort.property = column.property;
+    sort.type = column.type;
+    this.refresh();
   }
 
   render() {
+    const {config, data} = this.state;
+    if (!data) return null;
+
+    const {filters, page, pageCount, sort} = config;
     const {columns, filter} = this.props;
-    const {filteredData, filters, sortAscending, sortColumn} = this.state;
 
     const headings = columns.map((column, index) =>
-      <th key={index} onClick={this.sortColumn.bind(this, column)}>
+      <th key={index} onClick={this.sort.bind(this, column)}>
         {column.heading}
         {
-          column !== sortColumn ? <span className="sort"/> :
-          sortAscending ? <span className="sort">&#x25b2;</span> :
+          column.property !== sort.property ? <span className="sort"/> :
+          sort.ascending ? <span className="sort">&#x25b2;</span> :
             <span className="sort">&#x25bc;</span>
         }
       </th>);
@@ -90,18 +86,21 @@ class VRTable extends React.Component {
     const filterRow = !filter ? null :
       <tr>
         {
-          columns.map((column, index) =>
-            <td key={index}>
+          columns.map((column, index) => {
+            const filter = filters[index];
+            return <td key={index}>
               <input
                 onChange={this.changeFilter.bind(this, index)}
                 type={column.type}
-                value={filters[index] || ''}/>
-            </td>)
+                value={filter ? filter.value : ''}
+              />
+            </td>;
+          })
         }
-        <td><button onClick={this.filter}>Apply</button></td>
+        <td><button onClick={this.refresh}>Apply</button></td>
       </tr>;
 
-    const rows = filteredData.map((obj, index) =>
+    const rows = data.map((obj, index) =>
       <tr key={index}>
         {
           columns.map((column, index) =>
@@ -112,17 +111,27 @@ class VRTable extends React.Component {
       </tr>);
 
     return (
-      <table className="vr-table">
-        <thead>
-          <tr className="headings">
-            {headings}
-          </tr>
-          {filterRow}
-        </thead>
-        <tbody>
-          {rows}
-        </tbody>
-      </table>
+      <div>
+        <table className="vr-table">
+          <thead>
+            <tr className="headings">
+              {headings}
+            </tr>
+            {filterRow}
+          </thead>
+          <tbody>
+            {rows}
+          </tbody>
+        </table>
+
+        {
+          pageCount === 1 ? null :
+            <div>
+              Showing page #{page}.
+              NEED PAGINATION BUTTONS!
+            </div>
+        }
+      </div>
     );
   }
 }

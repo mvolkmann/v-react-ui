@@ -3,16 +3,22 @@
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
+    "eslint": "^3.9.0",
+    "eslint-find-rules": "^1.14.3",
+    "eslint-plugin-html": "^1.5.5",
+    "eslint-plugin-react": "^6.4.1",
     "react-scripts": "0.6.1"
   },
   "dependencies": {
     "react": "^15.3.2",
-    "react-dom": "^15.3.2"
+    "react-dom": "^15.3.2",
+    "spectre.css": "^0.1.27"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "efr": "eslint-find-rules --unused ~/.eslintrc --no-error"
   }
 }

@@ -6,14 +6,12 @@ class VRListSwap extends React.Component {
   static propTypes = {
     display: string.isRequired,
     left: arrayOf(object).isRequired,
+    onUpdate: func.isRequired,
     right: arrayOf(object).isRequired,
-    size: number,
-    update: func.isRequired
+    size: number
   };
 
-  static defaultProps = {
-    size: 5
-  };
+  static defaultProps = {size: 5};
 
   static getOptions(items, prop) {
     return items.map((item, index) =>
@@ -65,7 +63,7 @@ class VRListSwap extends React.Component {
     // Tell the parent component about the change.
     const newLeft = fromLeft ? newFrom : newTo;
     const newRight = fromLeft ? newTo : newFrom;
-    this.props.update(newLeft, newRight);
+    this.props.onUpdate(newLeft, newRight);
   }
 
   render() {

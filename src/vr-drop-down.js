@@ -33,10 +33,10 @@ class VRDropDown extends React.Component {
   render() {
     return (
       <select className="vr-drop-down" onChange={this.onChange}>
-      {
-        this.props.options.map(opt =>
-          <option key={opt.value} value={opt.value}>{opt.text}</option>)
-      }
+        {
+          this.props.options.map(opt =>
+            <option key={opt.value} value={opt.value}>{opt.text}</option>)
+        }
       </select>);
   }
 }
